@@ -5,6 +5,9 @@
  * Licensed under MIT (http://opensource.org/licenses/MIT)
  */
 
+
+// ----- running
+
 let fps = 60,
     el = document.getElementById("canvas"),
     canvas = el.getContext("2d");
@@ -32,25 +35,20 @@ let frontLayer = new Layer({
 	maxSpeed: 0.5
 });
 
-backLayer.generate();
-midLayer.generate();
-frontLayer.generate();
-
 animate();
+
+
+// ----- fuctions
 
 function animate() {
 	setTimeout(function() {
 		requestAnimationFrame(animate);
 		
 		clear();
-		
-		backLayer.draw(canvas);
-		midLayer.draw(canvas);
-		frontLayer.draw(canvas);
 
-		backLayer.step();
-		midLayer.step();
-		frontLayer.step();
+		backLayer.step(canvas);
+		midLayer.step(canvas);
+		frontLayer.step(canvas);
 	}, 3600 / fps);
 }
 

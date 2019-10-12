@@ -13,11 +13,17 @@ function Layer( opts ) {
   
   // ----- properties
 
-  this.symbols;
-  this.font = {};    // font of symbols
-  this.alfa;         // alfa chanel
+  this.symbols;      // string of using symbols
   this.string = [];  // array of symbols, contain x,y coordinates and speed
-  this.maxSpeed;     // max speed of in string
+  this.maxSpeed;     // max speed in string
+  this.alfa;         // alfa chanel of layer
+
+  this.fontSize;     // font size of symbols
+  this.fontFamily;   // font family of symbols
+  this.fontColor;    // font color of symbols
+
+  this.hSymColor;    // color of highlighted symbol
+  this.hSymProb;     // probability of drawing highlighted symbol
 
   
   // ----- private properties
@@ -35,6 +41,9 @@ function Layer( opts ) {
   this.fontFamily = opts.fontFamily || "sans-serif";
   this.fontColor = opts.fontColor || "0, 247, 255";
 
+  this.hSymColor = opts.hSymColor || "rgba(255, 247, 0, 1)";
+  this.hSymProb = opts.hSymProb || 1000; // "1 / 1000"
+
   _countColls = Math.ceil(window.innerWidth / this.fontSize);
 
 
@@ -46,23 +55,9 @@ function Layer( opts ) {
   this.generate = function () {
     for (let i = 0; i < _countColls; i++) {
       this.string[i] = {
-        x: this.fontSize * i,                     // x coordinate
+        x: this.fontSize * i,                      // x coordinate
         y: Math.random() * window.innerHeight,     // y coordinate
         s: Math.random() * this.maxSpeed + 1       // speed
-      }
-    }
-  }
-
-  /*
-   * generate step of string
-   */
-  this.step = function () {
-    for (let i = 0; i < _countColls; i++) {
-      this.string[i].y += this.fontSize * this.string[i].s;
-
-      if (this.string[i].y > window.innerHeight) {
-        this.string[i].y = 0;
-        this.string[i].s = Math.random() * this.maxSpeed + 1;
       }
     }
   }
@@ -75,9 +70,9 @@ function Layer( opts ) {
     for (let i = 0; i < _countColls; i++) {
       let symId = Math.round(Math.random() * (this.symbols.length - 1));
 
-      // set white color
-      if (Math.floor(Math.random() * 1000) === 5) {
-        canvas.fillStyle = "rgba(255, 247, 0, 1)";
+      // draw highlighted symbol
+      if (Math.floor(Math.random() * this.hSymProb) === 1) {
+        canvas.fillStyle = this.hSymColor;
       } else {
         canvas.fillStyle = "rgba(" + this.fontColor + ", " + this.alfa + ")";
       }
@@ -85,6 +80,23 @@ function Layer( opts ) {
       canvas.font = "normal normal " + this.fontSize + "px " + this.fontFamily;
       canvas.fillText(this.symbols[symId], this.string[i].x, this.string[i].y);
     }
+  }
+
+  /*
+   * generate step of string
+   * @param canvas - Canvas Element
+   */
+  this.step = function ( canvas ) {
+    for (let i = 0; i < _countColls; i++) {
+      this.string[i].y += this.fontSize * this.string[i].s;
+
+      if (this.string[i].y > window.innerHeight) {
+        this.string[i].y = 0;
+        this.string[i].s = Math.random() * this.maxSpeed + 1;
+      }
+    }
+
+    this.draw(canvas);
   }
 
 
